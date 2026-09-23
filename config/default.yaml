@@ -1,0 +1,7 @@
+# The parameters of your project. Committed, reviewed, and changed in a commit with a reason —
+# a change here changes your results, so it belongs in the history like any other change.
+#
+# Every scientific parameter goes here, with units in a comment where they are not obvious.
+# Nothing in src/ should contain a number a reviewer could ask "why that value?" about.
+
+seed: 20260101          # fixes every random draw; recorded in run_metadata.json

@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info
+*.egg-info/
+build/
+dist/
+.coverage
+htmlcov/
+
+# Environments — never commit an environment, only the recipe for one
+.venv/
+venv/
+env/
+.conda/
+envs/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Generated output — never commit results or data. One exception: the checksum manifest of
+# data/raw/ (data/raw_manifest.sha256) IS committed -- it's a claim about the data, not the
+# data itself (Week 3, "This week's check"). A blanket `data/` would silently ignore that file
+# too, since git will not recurse into an ignored directory to honor a nested negation.
+results/
+outputs/
+data/*
+!data/raw_manifest.sha256
+*.h5ad
+
+# OS and editor junk
+.DS_Store
+Thumbs.db
+~$*
+*~
+.vscode/
+.idea/
+
+# Secrets — if one of these is ever committed, treat it as public and rotate it (Week 2)
+.env
+.envrc
+*.pem
+*.key
+credentials*
+
+# Nextflow (Week 12)
+work/
+.nextflow*
+
+# container images (Week 11)
+*.sif
+
+# the local answer to a golden-output comparison (Week 13)
+golden.json
+
+# Note on what is NOT here: run_metadata.json is deliberately not ignored on its own, because it
+# lives inside results/, which is. If you write it anywhere else, it is a generated file and belongs
+# with the results — not in git.

@@ -1,0 +1,26 @@
+# The environment this project needs. Anyone should be able to rebuild it from this file:
+#     conda env create -f environment.yml
+# If you install something new, add it here in the same commit.
+#
+# What is deliberately NOT here: Nextflow, and Docker/Podman/Apptainer. Those are tools that RUN
+# your project, not things your project imports — and this file is baked into your container image
+# (Week 11) and installed by CI (Week 12), so a workflow engine in here would end up inside the
+# image it is supposed to launch. Install them separately; see the toolchain document.
+#
+# jupyterlab is the one deliberate exception to that rule: it doesn't run the project either, but
+# it's what opens the weekly practice notebooks (personal, never committed to this repository), and
+# this is the one environment you use for everything all term — see the toolchain document.
+name: pls2026
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - scikit-learn
+  - pyyaml
+  - pytest
+  - ruff
+  - jupyterlab
