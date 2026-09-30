@@ -1,29 +1,57 @@
-# <project name> spatial-decode
+# spatial-decode (Analysis Track)
 
-## What it does
+## Tool Description
 
-The program will take the data of genes in the tissue, provided by the simulation track and will finally give back an estimation of how 
-the cell types are spatially distributed in the simulated tissue. To get to this point, the data has to be binned & the cell-types in
-each bin have to be determined. Finally, the result should be stored against a ground truth (also provided by the simulation track).
+Using syntetic spatial transcriptomics data (2 um square counts + coordinates + a single-cell reference), the task is to try to recover the hidden structure. This includes firstly binning the squares of the tissue. Then comes deconvolution, that is estimating the fraction transcripts that came from each cell type in each bin. In addition, includes detecting(partitioning) the spatial domains and evaluating the model performance against the simulator's truth.
+
 
 ## Inputs
 
-- coordinates.csv = position of each square on the grid
-- counts.csv = squares x gene count matrix
-- reference / directory = includes reference_counts.csv (individually profiled cells), reference_labels.csv (cell types of reference cells)
-  metadata.json (format version, square size and other metadata on the "tissue" and "experiment")
+**counts.csv** - transcript counts at 2 um resolution (160x160 = 25,600 squares), binned by the pipeline to 8 um or 16 um. Shape (N_bins, G), integer dtype, no negative values. Bin size is a parameter, not hardcoded.
+
+**reference/** - single-cell reference experiment used to estimate per-type expression signatures. Shape (N_cells, G) with cell-type labels.
+
+**coordinates.csv** - spatial position (um) of every 2 um square, used for binning and spatial smoothing.
+
+**ground_truth/** - answer key used only for scoring, never for inference. Stores transcript counts per cell type per square (not fractions), so that aggregation to any bin size is correct: sum counts over the block, then divide. ground_truth/params.json lists the 15 marker genes (5 per type).
+
+Three **cell types**: A, B, C. RNA content ratio roughly 1 : 1.8 : 1.3 - fraction of transcripts and fraction of cells are not the same number.
+
 
 ## Outputs
 
-- predicted_composition.csv = includes bin_id, cell_type and fraction
-- predicted_domains.csv = contains bin_id and domain
-- run_metadata.json = contains contact version consumed, tool version, parameters and bin_size_um used
+A **composition matrix** of shape (N_bins, N_types) - fractions >=0, summing to 1 across types for every bin.
 
-## Acceptance criteria
+A scalar **ARI score** comparing recovered domain assignments to ground-truth labels, computed per 2 um square (a bin's predicted label applies to every square in it).
 
-Concrete, checkable statements of "how we will know it is right". Tag each with the kind of
-check that enforces it (smoke, known-answer, property, metamorphic, characterization,
-schema/validation, reproducibility).
+Optionally: composition RMSE and Jensen-Shannon divergence against ground truth.
+
+
+## Acceptance Criteria 
+
+**[smoke test]** The pipeline runs end to end, including loading data, running deconvolution and writing scores, on the toy datasetof 400 cells, without raising an exception.
+
+**[property check]** The output fractions of deconvolution per bin are >=0 and sum to 1 for every spatial bin.
+
+**[metamorphic test]** ARI at 0.2xsignal is lower than ARI at 1x signal.
+
+**[reproducibility test]** Running the pipeline with the same seed, produces identical ARI scores every time.
+
+**[schema / validation check]** The deconvolution output has shape (N_bins, N_types), all values are float and no entry is Nan.
+
+**[schema / validation check]** Every (array_row, array_col) pair appears exactly once in coordinates.csv, and um coordinates agree with indices and square size, meaning the grid is complete.
+
+**[property check]** There must be binning consistency, meaning the four 8 um bins that tile a 16 um bin sum to it exactly, gene by gene. 
+
+
+## First Known Answer - tiny input whose correct output we can state by hand
+
+Input: a 4-cell tissue, 2 genes, 2 cell types.
+
+counts = [[8, 1],   # strong GENE_00 -> type A
+          [7, 0],   # strong GENE_00 -> type A
+          [0, 9],   # strong GENE_01 -> type B
+          [1, 8]]   # strong GENE_01 -> type B
 
 1. `[known-answer test]` For a bin built from equal transcript amounts of two cell types whose cells differ 3-fold in RNA
    content, the estimated fractions are 0.5 / 0.5 (not 0.75 / 0.25).
@@ -34,8 +62,11 @@ schema/validation, reproducibility).
    ARI(smoothed) > 0.7.
 
 
-## First known answer
+expected composition (by hand):
 
+bins 0 and 1 -> nearly all type A (fraction A ≈ 1.0, fraction B ≈ 0.0)
+bins 2 and 3 -> nearly all type B (fraction A ≈ 0.0, fraction B ≈ 1.0)
+------
 Two genes, two cell types. Type A only expresses gene 1, type B only expresses
 gene 2. An A cell has 10 transcripts, a B cell has 30 (RNA content 1 : 3).
 Reference signatures (column-normalized): S = [[1, 0], [0, 1]].
