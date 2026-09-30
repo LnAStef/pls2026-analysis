@@ -1,4 +1,4 @@
-# <project name> — specification
+# <project name> spatial-decode
 
 ## What it does
 
@@ -25,11 +25,20 @@ Concrete, checkable statements of "how we will know it is right". Tag each with 
 check that enforces it (smoke, known-answer, property, metamorphic, characterization,
 schema/validation, reproducibility).
 
-1. `metamorphic` The ARI(smoothed) must be >= the ARI(unsmoothed) (= better domain clustering after smoothing).
-2. `known-answer` The sum of four 8 um bins is = sum of their 16 um bin.
-3. `known-answer` Better performance than shuffled-label and uniform-composition baseline.
+1. `[known-answer test]` For a bin built from equal transcript amounts of two cell types whose cells differ 3-fold in RNA
+   content, the estimated fractions are 0.5 / 0.5 (not 0.75 / 0.25).
+2. `[property test]` For every bin, on any valid input dataset, the predicted
+   fractions are all >= 0 and sum to 1 (within 1e-3).
+3. `[metamorphic test]` On the reference dataset at 8 µm, spatial smoothing
+   improves domain recovery: ARI(smoothed) > ARI(unsmoothed), and
+   ARI(smoothed) > 0.7.
+
 
 ## First known answer
 
-Input: I do not understand.
-Expected output: see above
+Two genes, two cell types. Type A only expresses gene 1, type B only expresses
+gene 2. An A cell has 10 transcripts, a B cell has 30 (RNA content 1 : 3).
+Reference signatures (column-normalized): S = [[1, 0], [0, 1]].
+Input: one bin with counts y = [30, 30] (30 transcripts from A, 30 from B).
+Expected output: fractions A = 0.5, B = 0.5.
+(Wrong, un-normalized S = [[10, 0], [0, 30]] would give w = [3, 1] -> 0.75 / 0.25.)
