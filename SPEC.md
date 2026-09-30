@@ -2,23 +2,22 @@
 
 ## What it does
 
-SpatialDecode takes a spatial transcriptomics dataset (counts per 2 µm², coordinates, and a single-cell reference) and can answer the following questions:
-Which fraction of each bin's transcripts comes from which cell type (deconvolution) and to which spatial domain each bin belongs. It then compares its own answers with the simulator's ground truth. The deconvolution/domain method is tested and correct results are obtained before it is applied to real data.
-
+The program will take the data of genes in the tissue, provided by the simulation track and will finally give back an estimation of how 
+the cell types are spatially distributed in the simulated tissue. To get to this point, the data has to be binned & the cell-types in
+each bin have to be determined. Finally, the result should be stored against a ground truth (also provided by the simulation track).
 
 ## Inputs
 
-SpatialDecode takes a spatial transcriptomics dataset (counts per 2 µm², coordinates, and a single-cell reference) and can answer the following questions:
-Which fraction of each bin's transcripts comes from which cell type (deconvolution) and to which spatial domain each bin belongs. It then compares its own answers with the simulator's ground truth. The deconvolution/domain method is tested and correct results are obtained before it is applied to real data.
+- coordinates.csv = position of each square on the grid
+- counts.csv = squares x gene count matrix
+- reference / directory = includes reference_counts.csv (individually profiled cells), reference_labels.csv (cell types of reference cells)
+  metadata.json (format version, square size and other metadata on the "tissue" and "experiment")
 
 ## Outputs
 
-A `results_<name>/` directory (Data Contract §4):
-- `predicted_composition.csv` (bin_id, cell_type, fraction)
-- `predicted_domains.csv` (bin_id, domain)
-- `run_metadata.json` (contract version, tool version, parameters, bin_size_um)
-plus scores: RMSE and Jensen–Shannon divergence (composition), ARI (domains).
-
+- predicted_composition.csv = includes bin_id, cell_type and fraction
+- predicted_domains.csv = contains bin_id and domain
+- run_metadata.json = contains contact version consumed, tool version, parameters and bin_size_um used
 
 ## Acceptance criteria
 
