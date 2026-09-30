@@ -53,10 +53,23 @@ counts = [[8, 1],   # strong GENE_00 -> type A
           [0, 9],   # strong GENE_01 -> type B
           [1, 8]]   # strong GENE_01 -> type B
 
-program = {"A": [8.0, 1.0],
-           "B": [1.0, 8.0]}
+1. `[known-answer test]` For a bin built from equal transcript amounts of two cell types whose cells differ 3-fold in RNA
+   content, the estimated fractions are 0.5 / 0.5 (not 0.75 / 0.25).
+2. `[property test]` For every bin, on any valid input dataset, the predicted
+   fractions are all >= 0 and sum to 1 (within 1e-3).
+3. `[metamorphic test]` On the reference dataset at 8 µm, spatial smoothing
+   improves domain recovery: ARI(smoothed) > ARI(unsmoothed), and
+   ARI(smoothed) > 0.7.
+
 
 expected composition (by hand):
 
 bins 0 and 1 -> nearly all type A (fraction A ≈ 1.0, fraction B ≈ 0.0)
 bins 2 and 3 -> nearly all type B (fraction A ≈ 0.0, fraction B ≈ 1.0)
+------
+Two genes, two cell types. Type A only expresses gene 1, type B only expresses
+gene 2. An A cell has 10 transcripts, a B cell has 30 (RNA content 1 : 3).
+Reference signatures (column-normalized): S = [[1, 0], [0, 1]].
+Input: one bin with counts y = [30, 30] (30 transcripts from A, 30 from B).
+Expected output: fractions A = 0.5, B = 0.5.
+(Wrong, un-normalized S = [[10, 0], [0, 30]] would give w = [3, 1] -> 0.75 / 0.25.)
