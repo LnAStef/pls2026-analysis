@@ -43,6 +43,14 @@ Optionally: composition RMSE and Jensen-Shannon divergence against ground truth.
 
 **[property check]** There must be binning consistency, meaning the four 8 um bins that tile a 16 um bin sum to it exactly, gene by gene. 
 
+**[smoke test]** The program runs end to end on its current input and writes its outputs.
+
+**[reproducibility test]** A teammate who has never run this project can create the environment from environment.yml, install the package with pip install -e ., and get a clean pytest run without installing anything else by hand.
+
+**[schema/validation check]** The program refuses to run if any file under data/raw/ does not match the recorded checksum.
+
+**[reproducibility test]** Deleting results/ and rerunning with the same config and seed reproduces the outputs. 
+
 
 ## First Known Answer - tiny input whose correct output we can state by hand
 
