@@ -13,7 +13,7 @@ def a_small_raw_directory(tmp_path):
 
 def test_silent_on_an_untouched_directory(tmp_path):
     root, manifest_path = a_small_raw_directory(tmp_path)
-    assert verify(root, manifest_path) == {"changed": set(), "missing": set(), "added": set
+    assert verify(root, manifest_path) == {"changed": set(), "missing": set(), "added": set()}
 
 
 def test_reports_a_modified_file_as_changed(tmp_path):
