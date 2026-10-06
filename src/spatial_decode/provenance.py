@@ -14,15 +14,12 @@ def manifest(root):
     """
     root = Path(root)
 
-    result = {}
+    return {
+        str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in root.rglob("*")
+        if path.is_file()
+    }
 
-    for path in sorted(root.rglob("*")):
-        if path.is_file():
-            relative_path = path.relative_to(root).as_posix()
-            digest = sha256(path.read_bytes()).hexdigest()
-            result[relative_path] = digest
-
-    return result
 
 
 
@@ -33,15 +30,7 @@ def write_manifest(m, path):
         m: {relative_path: sha256 hex digest}, as returned by `manifest()`.
         path: file to write, e.g. `data/raw_manifest.sha256`.
     """
-    path = Path(path)
-
-    path.write_text(
-        "".join(
-            f"{digest}  {name}\n"
-            for name, digest in sorted(m.items())
-        ),
-        encoding="utf-8",
-    )
+    path.write_text("".join(f"{h}  {name}\n" for name, h in sorted(m.items())))
 
 
 def verify(root, manifest_path):
@@ -58,46 +47,31 @@ def verify(root, manifest_path):
         untouched directory returns three empty sets.
     """
     # YOUR TURN
-    return {"changed": set(), "missing": set(), "added": set()}
-
-
-
-    """Compare a directory against a previously recorded manifest."""
     root = Path(root)
     manifest_path = Path(manifest_path)
 
-    # Manifest-Datei einlesen:
-    # Format: sha256-hash zwei Leerzeichen relativer/pfad
-    expected = {}
+    recorded = {}
 
-    for line in manifest_path.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
+    for line in manifest_path.read_text().splitlines():
+        if not line:
             continue
 
-        digest, separator, name = line.partition("  ")
+        digest, name = line.split("  ", 1)
+        recorded[name] = digest
 
-        if not separator:
-            raise ValueError(f"Invalid manifest line: {line!r}")
+    current = manifest(root)
 
-        expected[name] = digest
-
-    # Aktuellen Zustand des Ordners berechnen
-    actual = manifest(root)
-
-    expected_names = set(expected)
-    actual_names = set(actual)
+    recorded_paths = set(recorded)
+    current_paths = set(current)
 
     changed = {
         name
-        for name in expected_names & actual_names
-        if expected[name] != actual[name]
+        for name in recorded_paths & current_paths
+        if recorded[name] != current[name]
     }
-
-    missing = expected_names - actual_names
-    added = actual_names - expected_names
 
     return {
         "changed": changed,
-        "missing": missing,
-        "added": added,
+        "missing": recorded_paths - current_paths,
+        "added": current_paths - recorded_paths,
     }
