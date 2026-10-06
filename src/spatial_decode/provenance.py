@@ -1,9 +1,9 @@
-from hashlib import sha256
+import hashlib 
 from pathlib import Path
 
 
 def manifest(root):
-        """Fingerprint every file under a directory.
+    """Fingerprint every file under a directory.
 
     Args:
         root: directory to scan, recursively.
@@ -13,7 +13,6 @@ def manifest(root):
         `read_text()`), since a text decode can silently change what gets hashed.
     """
     root = Path(root)
-
     return {
         str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in root.rglob("*")
@@ -30,6 +29,7 @@ def write_manifest(m, path):
         m: {relative_path: sha256 hex digest}, as returned by `manifest()`.
         path: file to write, e.g. `data/raw_manifest.sha256`.
     """
+    path = Path(path)
     path.write_text("".join(f"{h}  {name}\n" for name, h in sorted(m.items())))
 
 
