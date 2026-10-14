@@ -22,3 +22,11 @@ Copy the block below into your own file and delete nothing else from this direct
 
 Record your one or two most significant AI uses each week — the ones where verification
 actually mattered. Not every keystroke.
+
+
+## 07.10.2026 - manifest()
+- please tell me how to do manifest()
+- the whole code
+- ??
+- nothing found
+- accepted
