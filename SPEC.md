@@ -51,6 +51,8 @@ Optionally: composition RMSE and Jensen-Shannon divergence against ground truth.
 
 **[reproducibility test]** Deleting results/ and rerunning with the same config and seed reproduces the outputs. 
 
+**[characterization test]** deconvolve() output on a fixed tiny input (2 bins, 2 genes, 2 cell types) matches the committed golden hash — catches any accidental change after refactoring.
+
 
 ## First Known Answer - tiny input whose correct output we can state by hand
 
