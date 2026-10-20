@@ -1,7 +1,7 @@
 # <project name>
 
-**Group:** <names of all of you>
-**Track:** simulation (`tissue-sim`) / analysis (`spatial-decode`) — delete one
+**Group:** Catalina, Vera, Christian, Janine and ?
+**Track:** analysis (`spatial-decode`) 
 
 > Replace everything in angle brackets. This README is graded, and the criterion is simple:
 > can someone who has never met you clone this repository and reproduce a result?
@@ -11,7 +11,10 @@
 
 ## What this does
 
-<One paragraph, in your own words. What problem does this program solve, and for whom?>
+Build a program that takes synthetic spatial-transcriptomics data (2 µm square counts + coordi-
+nates + a single-cell reference), bins it, and (a) estimates the cell-type composition of each
+bin (deconvolution) and (b) partitions the tissue into spatial domains (domain detection), then
+measures how close it got to the simulator’s truth.
 
 ## Install
 
