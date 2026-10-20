@@ -1,0 +1,10 @@
+{
+  "spatial_counts_shape": [
+    25600,
+    101
+  ],
+  "reference_counts_shape": [
+    240,
+    101
+  ]
+}
