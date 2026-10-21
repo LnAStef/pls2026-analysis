@@ -1,6 +1,6 @@
-# <project name>
+# <Analysis Track>
 
-**Group:** Catalina, Vera, Christian, Janine and ?
+**Group:** Catalina, Vera, Christian, Janine and Elena
 **Track:** analysis (`spatial-decode`) 
 
 > Replace everything in angle brackets. This README is graded, and the criterion is simple:
