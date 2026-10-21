@@ -2,7 +2,7 @@
 
 import json
 
-from spatial_decode.io import load_dataset
+from spatial_decode.dataset import load_dataset
 
 
 def test_load_dataset_reads_expected_files(tmp_path):
