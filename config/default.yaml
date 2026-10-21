@@ -5,3 +5,8 @@
 # Nothing in src/ should contain a number a reviewer could ask "why that value?" about.
 
 seed: 20260101          # fixes every random draw; recorded in run_metadata.json
+
+# --- §3.4 spatial-domain detection -------------------------------------------------------
+n_domains: 3            # K, number of spatial domains KMeans looks for
+smoothing_radius: 2     # r, in BINS (not µm): window is (2r+1) x (2r+1); 0 = no smoothing
+kmeans_n_init: 10       # KMeans restarts with different centroid seeds; best inertia is kept
