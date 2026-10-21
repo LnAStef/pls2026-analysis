@@ -52,6 +52,9 @@ Optionally: composition RMSE and Jensen-Shannon divergence against ground truth.
 **[reproducibility test]** Deleting results/ and rerunning with the same config and seed reproduces the outputs. 
 
 **[characterization test]** deconvolve() output on a fixed tiny input (2 bins, 2 genes, 2 cell types) matches the committed golden hash — catches any accidental change after refactoring.
+**[schema/validation test]** ruff check . exits cleanly on the whole package. 
+
+**[characterization test]** Running ruff format does not change the program's output: the result hash matches the value recorded in week 4. 
 
 
 ## First Known Answer - tiny input whose correct output we can state by hand
