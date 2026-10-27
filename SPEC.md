@@ -56,6 +56,10 @@ Optionally: composition RMSE and Jensen-Shannon divergence against ground truth.
 
 **[characterization test]** Running ruff format does not change the program's output: the result hash matches the value recorded in week 4. 
 
+**[known-answer test]** pytest --doctest-modules passes: every example in every docstring produces what the docstring says it does.
+
+**[schema/validation check]** Every file path mentioned in the README exists in the repository. 
+
 
 ## First Known Answer - tiny input whose correct output we can state by hand
 
