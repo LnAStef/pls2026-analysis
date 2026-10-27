@@ -6,6 +6,7 @@ on installation.
 `ruff` is reported as a warning rather than a failure: it is in `environment.yml` and you will
 need it from Week 5, so a warning here means your environment was not built from that file.
 """
+
 import pathlib
 import re
 import shutil
@@ -21,7 +22,9 @@ def version_of(cmd):
     if exe is None:
         return None
     try:
-        out = subprocess.run([cmd, "--version"], capture_output=True, text=True, timeout=15)
+        out = subprocess.run(
+            [cmd, "--version"], capture_output=True, text=True, timeout=15
+        )
         return (out.stdout or out.stderr).strip().splitlines()[0]
     except Exception:
         return "found, but would not report a version"
@@ -32,11 +35,18 @@ def main():
 
     py = sys.version_info
     ok = (py.major, py.minor) >= (3, 11)
-    print(f"[{'PASS' if ok else 'FAIL'}] Python {py.major}.{py.minor}.{py.micro} (need 3.11+)")
+    print(
+        f"[{'PASS' if ok else 'FAIL'}] Python {py.major}.{py.minor}.{py.micro} (need 3.11+)"
+    )
     if not ok:
         problems.append("Python is older than 3.11")
 
-    for cmd, needed in (("git", True), ("conda", True), ("jupyter", True), ("ruff", False)):
+    for cmd, needed in (
+        ("git", True),
+        ("conda", True),
+        ("jupyter", True),
+        ("ruff", False),
+    ):
         v = version_of(cmd)
         if v:
             print(f"[PASS] {cmd}: {v}")
@@ -59,13 +69,17 @@ def main():
     # the wrong Python, and tomllib only exists from 3.11.
     name = None
     try:
-        m = re.search(r'^name\s*=\s*"([^"]+)"', pathlib.Path("pyproject.toml").read_text(), re.M)
+        m = re.search(
+            r'^name\s*=\s*"([^"]+)"', pathlib.Path("pyproject.toml").read_text(), re.M
+        )
         name = m.group(1) if m else None
     except OSError:
         print("[WARN] no pyproject.toml here — are you in the project root?")
     if name in (None, "REPLACE-ME"):
         if name == "REPLACE-ME":
-            print("[WARN] pyproject.toml: name is still REPLACE-ME — set it to your package")
+            print(
+                "[WARN] pyproject.toml: name is still REPLACE-ME — set it to your package"
+            )
     else:
         module = name.replace("-", "_")
         try:
@@ -76,10 +90,14 @@ def main():
             # directory may not exist yet (expected until Week 3), or it exists and the install
             # has not been run.
             if not pathlib.Path("src", module).is_dir():
-                print(f"[WARN] no src/{module}/ yet — expected until Week 3, when you create it")
+                print(
+                    f"[WARN] no src/{module}/ yet — expected until Week 3, when you create it"
+                )
             else:
                 print(f"[FAIL] cannot import {module} — run  pip install -e .")
-                problems.append("your own package is not installed: run  pip install -e .")
+                problems.append(
+                    "your own package is not installed: run  pip install -e ."
+                )
 
     print()
     if problems:

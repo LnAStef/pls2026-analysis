@@ -45,6 +45,7 @@ def test_bin_counts_sums_squares_exactly():
     assert result.loc[0, "GENE_0001"] == 10
     assert result.loc[0, "GENE_0002"] == 100
 
+
 def test_four_8um_bins_sum_to_one_16um_bin():
     """Four 8 um bins should sum exactly to the matching 16 um bin."""
     square_size_um = 2
@@ -99,4 +100,3 @@ def test_four_8um_bins_sum_to_one_16um_bin():
 
     assert bins_16um.loc[0, "GENE_0001"] == bins_8um["GENE_0001"].sum()
     assert bins_16um.loc[0, "GENE_0002"] == bins_8um["GENE_0002"].sum()
-
