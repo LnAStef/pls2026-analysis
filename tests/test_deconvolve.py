@@ -1,4 +1,5 @@
-import hashlib, json
+import hashlib
+import json
 import numpy as np
 import pandas as pd
 from spatial_decode.deconvolve import deconvolve

@@ -1,7 +1,5 @@
 """Functions for spatial binning."""
 
-import pandas as pd
-
 
 def bin_counts(counts, coordinates, bin_size_um, square_size_um):
     """Sum square-level gene counts into larger spatial bins."""
@@ -54,6 +52,7 @@ def bin_counts(counts, coordinates, bin_size_um, square_size_um):
             for row, col in zip(
                 binned["bin_row"],
                 binned["bin_col"],
+		strict=True,
             )
         ],
     )
