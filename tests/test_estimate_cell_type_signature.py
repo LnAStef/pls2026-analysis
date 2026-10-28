@@ -2,6 +2,13 @@
 
 
 import pandas as pd
+from src.spatial_decode.estimate_cell_type_signatures import (
+    load_reference_counts,
+    load_reference_labels,
+    cell_id_match,
+    merge_counts_types,
+    mean_expression_matrix,
+)
 
 # Table 1: transcript counts for 10 reference cells and 5 genes
 transcripts = pd.DataFrame(
@@ -32,13 +39,7 @@ known_mean_expression = pd.DataFrame(
 ).set_index("cell_type")
 
 
-from src.spatial_decode.estimate_cell_type_signatures import (
-    load_reference_counts,
-    load_reference_labels,
-    cell_id_match,
-    merge_counts_types,
-    mean_expression_matrix,
-)
+
 
 counts = load_reference_counts(transcripts)
 labels = load_reference_labels(cell_types)
