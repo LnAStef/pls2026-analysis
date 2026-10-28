@@ -33,8 +33,8 @@ print(an_composition, an_domains)
 
 
 # comparing line by line
-for index_an, row_an in an_composition.iterrows():
-    for index_gt, row_gt in gt_composition.iterrows():
+for _index_an, row_an in an_composition.iterrows():
+    for _index_gt, row_gt in gt_composition.iterrows():
    
         #print(row_an["square_id"], row_gt["square_id"])
     
@@ -48,7 +48,7 @@ for index_an, row_an in an_composition.iterrows():
 # seeing if its "in there"
 x=0
 
-for index_an, row_an in an_composition.iterrows():
+for _index_an, row_an in an_composition.iterrows():
     
     if row_an["square_id"] in gt_composition["square_id"].values:
         x = x+1
