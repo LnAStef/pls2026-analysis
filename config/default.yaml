@@ -6,6 +6,9 @@
 
 seed: 20260101          # fixes every random draw; recorded in run_metadata.json
 
+# --- §3.1b spatial binning ---------------------------------------------------------------
+bin_size_um: 8          # side length of each analysis bin, in micrometres
+
 # --- §3.4 spatial-domain detection -------------------------------------------------------
 n_domains: 3            # K, number of spatial domains KMeans looks for
 smoothing_radius: 2     # r, in BINS (not µm): window is (2r+1) x (2r+1); 0 = no smoothing

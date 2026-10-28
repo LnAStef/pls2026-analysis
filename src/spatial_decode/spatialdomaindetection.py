@@ -40,7 +40,9 @@ def smooth_composition(comp, radius):
     """
     comp = np.asarray(comp, dtype=float)
     if comp.ndim != 3:
-        raise ValueError(f"comp must have shape (n_rows, n_cols, n_types), got {comp.shape}")
+        raise ValueError(
+            f"comp must have shape (n_rows, n_cols, n_types), got {comp.shape}"
+        )
     if radius < 0 or int(radius) != radius:
         raise ValueError(f"radius must be a non-negative integer, got {radius}")
     if radius == 0:
@@ -48,16 +50,24 @@ def smooth_composition(comp, radius):
 
     valid = _valid_mask(comp)
     filled = np.where(valid[..., None], comp, 0.0)
-    size = (2 * int(radius) + 1, 2 * int(radius) + 1, 1)  # no smoothing across cell types
+    size = (
+        2 * int(radius) + 1,
+        2 * int(radius) + 1,
+        1,
+    )  # no smoothing across cell types
 
     # uniform_filter returns window means; the ratio of two means equals sum / n_valid.
     # mode="constant" with cval=0 makes outside-the-grid positions count as "not valid".
     mean_values = uniform_filter(filled, size=size, mode="constant", cval=0.0)
-    mean_valid = uniform_filter(valid.astype(float), size=size[:2], mode="constant", cval=0.0)
+    mean_valid = uniform_filter(
+        valid.astype(float), size=size[:2], mode="constant", cval=0.0
+    )
 
     smoothed = np.full(comp.shape, np.nan)
     has_neighbours = mean_valid > 1e-12  # float-safe test for "at least one valid bin"
-    smoothed[has_neighbours] = mean_values[has_neighbours] / mean_valid[has_neighbours][:, None]
+    smoothed[has_neighbours] = (
+        mean_values[has_neighbours] / mean_valid[has_neighbours][:, None]
+    )
     return smoothed
 
 
@@ -99,7 +109,9 @@ def detect_domains(comp, n_domains, radius, seed, n_init):
     Returns:
         (labels_smoothed, labels_unsmoothed): two int arrays (n_rows, n_cols).
     """
-    labels_smoothed = cluster_domains(smooth_composition(comp, radius), n_domains, seed, n_init)
+    labels_smoothed = cluster_domains(
+        smooth_composition(comp, radius), n_domains, seed, n_init
+    )
     labels_unsmoothed = cluster_domains(comp, n_domains, seed, n_init)
     return labels_smoothed, labels_unsmoothed
 
@@ -120,9 +132,13 @@ def composition_to_grid(frame, n_rows, n_cols):
     if parts.isna().any(axis=None):
         raise ValueError("bin_id values must look like 'bin_r<row>_c<col>'")
     cell_types = sorted(frame["cell_type"].unique())
-    type_idx = frame["cell_type"].map({t: i for i, t in enumerate(cell_types)}).to_numpy()
+    type_idx = (
+        frame["cell_type"].map({t: i for i, t in enumerate(cell_types)}).to_numpy()
+    )
     grid = np.full((n_rows, n_cols, len(cell_types)), np.nan)
-    grid[parts[0].to_numpy(), parts[1].to_numpy(), type_idx] = frame["fraction"].to_numpy()
+    grid[parts[0].to_numpy(), parts[1].to_numpy(), type_idx] = frame[
+        "fraction"
+    ].to_numpy()
     # A bin listed with only some types is missing the others: they are zero, not unknown.
     listed = ~np.isnan(grid).all(axis=-1)
     grid[listed] = np.nan_to_num(grid[listed], nan=0.0)
@@ -140,7 +156,10 @@ def labels_to_frame(labels):
     rows, cols = np.indices(labels.shape)
     return pd.DataFrame(
         {
-            "bin_id": [f"bin_r{r}_c{c}" for r, c in zip(rows.ravel(), cols.ravel(), strict=True)],
+            "bin_id": [
+                f"bin_r{r}_c{c}"
+                for r, c in zip(rows.ravel(), cols.ravel(), strict=True)
+            ],
             "domain": labels.ravel(),
         }
     )

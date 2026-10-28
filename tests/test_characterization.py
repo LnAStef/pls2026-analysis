@@ -25,4 +25,3 @@ def test_reference_report_matches_golden_output(tmp_path):
     golden_output = Path("tests/golden/dataset_shape.json")
 
     assert file_sha256(actual_output) == file_sha256(golden_output)
-

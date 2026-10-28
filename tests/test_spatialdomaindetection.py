@@ -121,4 +121,9 @@ def test_long_table_round_trip_and_ids():
     assert np.isnan(grid[0, 1]).all()  # not listed = empty
     out = labels_to_frame(np.array([[0, 1], [1, 2]]))
     assert list(out.columns) == ["bin_id", "domain"]
-    assert out["bin_id"].tolist() == ["bin_r0_c0", "bin_r0_c1", "bin_r1_c0", "bin_r1_c1"]
+    assert out["bin_id"].tolist() == [
+        "bin_r0_c0",
+        "bin_r0_c1",
+        "bin_r1_c0",
+        "bin_r1_c1",
+    ]
