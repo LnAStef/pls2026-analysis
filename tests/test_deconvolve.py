@@ -51,3 +51,10 @@ def test_deconvolve_rejects_mismatched_genes():
     wrong = binned_tiny.rename(columns={"GENE_1": "OTHER"})
     with pytest.raises(ValueError):
         deconvolve(S_tiny, wrong)
+
+def test_deconvolve_units_are_transcripts_not_cells():
+    """Equal transcript amounts from types with 1:3 RNA content give 0.5 / 0.5."""
+    S = pd.DataFrame({"A": [10.0, 0.0], "B": [0.0, 30.0]}, index=["g1", "g2"])
+    y = pd.DataFrame({"g1": [30], "g2": [30]}, index=["bin"])
+    result = deconvolve(S, y)
+    assert np.allclose(result.loc["bin"], [0.5, 0.5])

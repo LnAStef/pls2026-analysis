@@ -30,3 +30,36 @@
 - **Decision:** accepted — cleaner and more readable, output unchanged
 
 ---
+
+## 2026-11-03 — deconvolve: labelled output, genes aligned by name, empty bins
+
+- **Prompt / question:** "Repair the deconvolution interfaces: return a labelled
+  composition instead of anonymous arrays, align genes by name instead of
+  positional .values, and decide what an empty-transcript bin returns. Add two
+  doctests."
+- **What it produced:** deconvolve() now returns a DataFrame (bins x cell types)
+  and raises ValueError on mismatched gene names; the maths is split into two
+  small helpers, normalise_columns() and to_fractions(), each with a doctest
+- **How I checked it:**
+  - doctests for deconvolve.py pass
+  - four new tests: labelled output, gene-order invariance (metamorphic), empty
+    bin returns NaN, mismatched genes raise ValueError
+  - known-answer test: A = 10 and B = 30 transcripts per cell, equal transcript
+    amounts in the bin, gives 0.5 / 0.5, not 0.75 / 0.25
+  - the golden hash did not change after hashing `result.to_numpy().tolist()`,
+    so the numbers are identical and only the return type changed
+- **What was wrong:**
+  1. the old version returned anonymous arrays, so nothing said which column was
+     which cell type
+  2. genes were matched by position (`.values`), so a different gene order would
+     silently give wrong results
+  3. an empty bin divided by zero (`w / w.sum()`)
+  4. the first suggested fix skipped empty bins with an extra `continue`; this was
+     redundant, because all-zero counts already give all-zero weights and
+     to_fractions() returns NaN, so I removed it
+  5. the old characterization and known-answer tests failed after the change
+     (iterating a DataFrame gives column names): expected, updated deliberately
+- **Decision:** accepted; empty bins return NaN because their composition is
+  undefined, and Data Contract §5 excludes them from scoring
+
+---
