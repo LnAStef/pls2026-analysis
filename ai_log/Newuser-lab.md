@@ -121,15 +121,60 @@ def test_output_matches_golden(path, golden):
 
 - **Decision:** The final function worked. In our repository, another group member added a test_charaterisation.py. 
 
+## Week07: 03.11.2026 - Optimise src/spatial_decode/estimate_cell_type_signatures.py and its test in tests/
+
+- **Prompt (duck.ai):** I run pytest and showed AI the output concerning my files. Then we discussed it. 
+- **What it produced:** In summary, it told me that I was not coherent in my program and its test. Some examples: I used the name ref_cell in my test but it was expecting cell_id. Then, I changed the name of ma test, so that has the same name as the program (an additional s after signatures). It prompted me to adapt my cell_id_match function in order to return a boolean and not a None. 
+- **Check:** I run pytest tests/test_estimate_cell_type_signatures.py. 
+- **What was wrong:** The column name of the actual and the expected matrix didn't match. So, I added expected.columns.name = "cell_type". 
+- **Decision:** I run pytest again. It passed. 
 
 
-## Week06: 28.10.2026 - pytest --doctest-modules output interpretation
+## Week07: 03.11.2026 - Add docstrings to my functions
+- **Prompt (duck.ai):** I fed AI my code and asked it to add docstrings. 
+- **What it produced:** It proposed docstrings to all of my functions. One example: 
+def load_reference_counts(path_ref_counts):
+    """Load the reference count table from a CSV file.
 
-- **Prompt (duck.ai):** I run pytest --doctest-modules and asked AI what the output means.
-- **What it produced:** One problem of my test_estimate_cell_type_signatures.py was:
-This code runs at the top level of the test file, so pytest executes it while importing the file for collection. The traceback says the failure occurs inside load_reference_counts, when it calls pd.read_csv(path_ref_counts).
+    Parameters
+    ----------
+    path_ref_counts : str or path-like
+        Path to the CSV file containing reference counts.
 
-The likely issue is the value ultimately used as path_ref_counts: it’s a method rather than a path or file-like object. 
+    Returns
+    -------
+    pandas.DataFrame
+        The count table as read by pandas.
+    """
+    ref_counts = pd.read_csv(path_ref_counts)
+    return ref_counts
+- **Check:** No specific check other than reading.
+- **What was wrong/Decision:** I think nothing was "wrong" but I adapted and shortened the text slightly. 
 
-- **Check:** 
+
+
+## Week07: 03.11.2026 - Add doctest to two functions
+
+- **Prompt (duck.ai):** I handed in my code of estimate_cell_type_signatures.py and asked AI to write me two doctests. 
+- **What it produced:** It added to doctests. 
+ Examples:
+        >>> transcripts = pd.DataFrame({"cell_id": ["c1", "c2"]})
+        >>> labels = pd.DataFrame({"cell_id": ["c1", "c2"]})
+        >>> cell_id_match(transcripts, labels)
+        True
+
+
+    Examples:
+        >>> merged = pd.DataFrame({
+        ...     "cell_type": ["A", "A", "B"],
+        ...     "Gene1": [2, 4, 6],
+        ... })
+        >>> S = mean_expression_matrix(merged)
+        >>> S.loc["Gene1", "A"]
+        3.0
+
+- **Check:** I run: python -m pytest --doctest-modules src/spatial_decode/estimate_cell_type_signatures.py. The second doctest failed.
+- **What was wrong:** The second doctest gave an error message because panda returned a float which was not recognized by doctest. 
+- **Decision:** I changed this line >>> S.loc["Gene1", "A"] to >>> float(S.loc["Gene1", "A"]) and accepted the two proposed doctests. 
+
 
