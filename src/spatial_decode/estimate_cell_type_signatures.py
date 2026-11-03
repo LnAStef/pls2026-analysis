@@ -34,6 +34,12 @@ def cell_id_match(transcripts, labels):
         Labels: table with cell types
     Returns: 
         Boolean: True if cell_id of both tables match and False if not
+	Examples:
+        	>>> transcripts = pd.DataFrame({"cell_id": ["c1", "c2"]})
+        	>>> labels = pd.DataFrame({"cell_id": ["c1", "c2"]})
+        	>>> cell_id_match(transcripts, labels)
+        	True
+
     """
     transcript_ids = set(
         transcripts["cell_id"].dropna().astype(str).str.strip()
@@ -66,6 +72,15 @@ def mean_expression_matrix(merged):
         merged: table containing cell_type and numeric gene transcript columns
     Returns:
         Mean expression matrix indexed by gene, with one column per cell type.
+
+    Doctest:
+        >>> merged = pd.DataFrame({
+        ...     "cell_type": ["A", "A", "B"],
+        ...     "Gene1": [2, 4, 6],
+        ... })
+        >>> S = mean_expression_matrix(merged)
+        >>> float(S.loc["Gene1", "A"])
+        3.0
     """
     S = merged.groupby("cell_type").mean(numeric_only=True).T
     return S
