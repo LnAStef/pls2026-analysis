@@ -37,6 +37,13 @@ def smooth_composition(comp, radius):
         radius: window half-width in bins, >= 0. 0 returns an unchanged copy.
     Returns:
         float array of the same shape as `comp`.
+
+    Example:
+        Two neighbouring bins, one pure type A and one pure type B, meet in the middle:
+
+        >>> comp = np.array([[[1.0, 0.0], [0.0, 1.0]]])
+        >>> smooth_composition(comp, radius=1)[0, 0].tolist()
+        [0.5, 0.5]
     """
     comp = np.asarray(comp, dtype=float)
     if comp.ndim != 3:
@@ -152,6 +159,10 @@ def labels_to_frame(labels):
         labels: int array (n_rows, n_cols).
     Returns:
         DataFrame with one row per bin, ids 'bin_r<row>_c<col>'.
+
+    Example:
+        >>> labels_to_frame(np.array([[0, 1]])).to_dict("list")
+        {'bin_id': ['bin_r0_c0', 'bin_r0_c1'], 'domain': [0, 1]}
     """
     rows, cols = np.indices(labels.shape)
     return pd.DataFrame(
