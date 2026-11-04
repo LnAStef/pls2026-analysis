@@ -27,7 +27,12 @@ Input and output formats are defined by the course Data Contract and are not dup
 
 Create the project environment from the repository root:
 
+<<<<<<< HEAD
 ```bash
+=======
+```
+bash
+>>>>>>> origin/cc-updates
 conda env create -f environment.yml
 conda activate pls2026
 pip install -e .
