@@ -5,33 +5,83 @@ import pandas as pd
 
 
 def load_reference_counts(path_ref_counts):
+    """ Load the reference count table from a CSV file.
+    Args: 
+        path_ref_counts: path to file
+    Returns:
+        Count table 
+    """
     ref_counts = pd.read_csv(path_ref_counts)
     return ref_counts
 
 
 def load_reference_labels(path_ref_labels):
+    """ Load the reference cell-label table from a CSV file
+    
+    Args.: 
+        path_ref_labels : path to file
+    Returns:
+       table with cell types 
+        """
     ref_labels = pd.read_csv(path_ref_labels)
     return ref_labels
 
 
-# Function to check if all the reference cells are in both csv files
-def cell_id_match(rname, transcripts, labels):
-    match = set(transcripts["rname"].dropna().astype(str).str.strip()) == set(
-        labels["rname"].dropna().astype(str).str.strip()
+def cell_id_match(transcripts, labels):
+    """Return whether both tables contain the same non-missing cell IDs.
+    Args.: 
+        transcripts: Count table
+        Labels: table with cell types
+    Returns: 
+        Boolean: True if cell_id of both tables match and False if not
+	Examples:
+        	>>> transcripts = pd.DataFrame({"cell_id": ["c1", "c2"]})
+        	>>> labels = pd.DataFrame({"cell_id": ["c1", "c2"]})
+        	>>> cell_id_match(transcripts, labels)
+        	True
+
+    """
+    transcript_ids = set(
+        transcripts["cell_id"].dropna().astype(str).str.strip()
     )
-    return print(match)
+    label_ids = set(
+        labels["cell_id"].dropna().astype(str).str.strip()
+    )
+    return transcript_ids == label_ids
 
 
 # Function to merge the two data sets by cell_id
 
 
 def merge_counts_types(ref_counts, ref_labels):
+    """ Join counts with cell_type labels using cell_id
+    Args.:
+        ref_count: Counts table containing cell_id column
+        ref_labels: Label table containing cell_id and cell_type columns
+    Returns: 
+        Inner_joined table containing counts and cell_types
+        """
     merged = ref_counts.merge(ref_labels, on="cell_id", how="inner")
     return merged
 
 
 # Function to generate the matrix S with genes as rows and cell types as columns
 def mean_expression_matrix(merged):
+    """ Calculate mean expression per cell type
+    Args.:
+        merged: table containing cell_type and numeric gene transcript columns
+    Returns:
+        Mean expression matrix indexed by gene, with one column per cell type.
+
+    Doctest:
+        >>> merged = pd.DataFrame({
+        ...     "cell_type": ["A", "A", "B"],
+        ...     "Gene1": [2, 4, 6],
+        ... })
+        >>> S = mean_expression_matrix(merged)
+        >>> float(S.loc["Gene1", "A"])
+        3.0
+    """
     S = merged.groupby("cell_type").mean(numeric_only=True).T
     return S
 
@@ -40,4 +90,10 @@ def mean_expression_matrix(merged):
 
 
 def write_matrix(S, results_path):
+    """ Write a gene-by-cell-type matrix to a CSV file.
+    Args.:
+        S: Matrix to write, with genes as rows and cell types as columns. 
+    Returns:
+        None 
+        Writes matrix to disc"""
     S.to_csv(results_path)
