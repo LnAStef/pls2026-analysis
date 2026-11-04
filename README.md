@@ -3,53 +3,48 @@
 **Group:** Catalina, Vera, Christian, Janine and Elena
 **Track:** analysis (`spatial-decode`) 
 
-> Replace everything in angle brackets. This README is graded, and the criterion is simple:
-> can someone who has never met you clone this repository and reproduce a result?
->
-> **One repository per group.** One of you creates it from the course template with git's *Use this
-> template*; the other two are added under *Settings → Collaborators* and clone it. Everyone making their own copy is the tangle we would spend a session undoing.
 
 ## What this does
 
-Build a program that takes synthetic spatial-transcriptomics data (2 µm square counts + coordi-
+This builds a program that takes synthetic spatial-transcriptomics data (gene counts from square wells + coordi-
 nates + a single-cell reference), bins it, and (a) estimates the cell-type composition of each
 bin (deconvolution) and (b) partitions the tissue into spatial domains (domain detection), then
 measures how close it got to the simulator’s truth.
 
+
 ## Install
 
-```bash
+```
+bash
 conda env create -f environment.yml
 conda activate pls2026
 pip install -e .
 ```
-
 The `-e` points the install at the source files, so an edit takes effect without reinstalling.
-Someone who only wants to *run* this project rather than work on it can leave it out; see the
-course document *Running a project from GitHub*.
+If you only wants to *run* this project rather than work on it, you can leave it out.
 
-## Run
 
-```bash
-<the one command that produces a result>
+## Run: to be completed at the end!!
+
 ```
+bash
+python nameofprogram.py 
+```
+
 
 ## Repository layout
 
 ```
-src/        the package you write
-tests/      the checks that prove it works
-config/     parameters — no magic numbers in the source
-SPEC.md     what this program must do, and how you will know it is correct
-ai_log/     your AI + verification log — one file per person, named for you
+src/        contains folder spatial_decode, package to run
+tests/      tests for each part of the project, to see if they work
+config/     parameters set by authors
+SPEC.md     what tthe program does and what checks we can run to see if it is correct
+ai_log/     AI logs for each author, recoring the most significant uses of AI throughout the coding
 ```
 
 ## Data
 
-The reference dataset is **not** in this repository. Refer to it by path; never commit data.
-
-<From Week 3: say where the data comes from and where the program expects it — a URL, a DOI, or
-"produced by group X's simulator". Someone who has only this repository has to be able to get it.>
+???
 
 ## Checks
 
@@ -60,10 +55,6 @@ ruff check .  # the style checks must pass
 
 ---
 
-The sections below are stubs. Each is filled in during the week named, and together they are what
-makes this repository runnable by someone who has never met you. The long-form explanation of what a
-runner does with them is the course document *Running a project from GitHub* — do not copy it in
-here; a README is answers, not a manual.
 
 ## Run in a container *(Week 11)*
 

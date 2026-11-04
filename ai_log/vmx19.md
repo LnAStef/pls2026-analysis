@@ -56,8 +56,99 @@ amount of rows. I implemented a count where it did +1 everytime the element was 
 - **Decision:** < accepted, problem was solved. >
 
 
+## 03/11/2026
+
+- **Prompt / ask:** < Ideas for how to compare the two data frames with each other. >
+        
+
+- **What it produced:** < A general workflow on how the problem could be approached:
+    1 Data preparation
+    Ignore DataFrame indices, standardize data types and handle missing values.
+    
+    
+    2 Group by square_id
+    Compare corresponding groups in both DataFrames.
+    
+    
+    3 Match individual records
+    Use a composite key if possible, otherwise find the best row-to-row correspondence within each group.
+    
+    
+    4 Compare individual columns
+    Use exact comparisons for categorical data and tolerances or normalized errors for numerical data.
+    
+    
+    5 Calculate metrics
+    Calculate record-level accuracy, column-level similarity, and numerical similarity.
+    
+    
+    6 Calculate final score
+    Combine the metrics using weights that reflect the importance of each column.>
 
 
+- **How you checked it:** < Since its not code, no check is really necessary or possible. >
+
+
+- **What was wrong:** < nothing found. >
+
+
+- **Decision:** < accepted, I take the ideas into consideration on how to move forward. >
+
+
+## 03/11/2026
+
+- **Prompt / ask:** < Would a sound workflow be to sort the two df in the same way, iterate through both of them 
+comparing line by line, skipping over anything that is different (recorded in a counter # of rows that are different and the same)
+ & then calculate the proportion of what is the same? Or do you see any problem with that? >
+        
+
+- **What it produced:** < Confirmation that this might be a good idea and a warning about accidentally skipping lines. >
+
+
+- **How you checked it:** < Since its not code, no check is really necessary or possible. >
+
+
+- **What was wrong:** < nothing found. >
+
+
+- **Decision:** < accepted, I take the warning into consideration on how to move forward. >
+
+
+## 04/11/2026
+
+- **Prompt / ask:** < In the context of this problem, what is a command I can use to check whether the current row is also present 
+in the other df? Something like .isinstance but not for a class but an element. >
+        
+
+- **What it produced:** < That what I am essentially looking for is .isin(). But for this project something else would work better since 
+.isin() only checks single elements while I want to check a whole row:
+ row_exists = (df_gt == row_an).all(axis=1).any() >
+
+
+- **How you checked it:** < I implemeted into my code in an if condition to see if it works. >
+
+
+- **What was wrong:** < nothing found. >
+
+
+- **Decision:** < accepted, I use the line of code moving forward. >
+
+
+## 04/11/2026
+
+- **Prompt / ask:** < The easiest way to add new rows (+ an element in a column not in the row) to a new data frame. >
+        
+
+- **What it produced:** < df_unique.loc[len(df_unique)] = [*row_an, match_value] >
+
+
+- **How you checked it:** < I implemeted into my code in an if condition to see if it works. >
+
+
+- **What was wrong:** < nothing found. >
+
+
+- **Decision:** < accepted, I use the line of code moving forward. >
 
 
 
