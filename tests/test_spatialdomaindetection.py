@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from sklearn.metrics import adjusted_rand_score
 
-from spatial_decode.cluster import (
+from spatial_decode.spatialdomaindetection import (
     UNASSIGNED,
     cluster_domains,
     composition_to_grid,
