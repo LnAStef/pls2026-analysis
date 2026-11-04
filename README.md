@@ -1,22 +1,31 @@
-# <Analysis Track>
+# spatial-decode project
 
-**Group:** Catalina, Vera, Christian, Janine and Elena
-**Track:** analysis (`spatial-decode`) 
+**Group:** Catalina, Vera, Christian, Janine and Elena  
+**Track:** analysis (`spatial-decode`)
 
-> Replace everything in angle brackets. This README is graded, and the criterion is simple:
-> can someone who has never met you clone this repository and reproduce a result?
->
-> **One repository per group.** One of you creates it from the course template with git's *Use this
-> template*; the other two are added under *Settings → Collaborators* and clone it. Everyone making their own copy is the tangle we would spend a session undoing.
+## What is this?
 
-## What this does
+`spatial-decode` is an analysis pipeline for synthetic spatial-transcriptomics data.
 
-Build a program that takes synthetic spatial-transcriptomics data (2 µm square counts + coordi-
-nates + a single-cell reference), bins it, and (a) estimates the cell-type composition of each
-bin (deconvolution) and (b) partitions the tissue into spatial domains (domain detection), then
-measures how close it got to the simulator’s truth.
+The project currently implements the main scientific components required by the analysis track:
 
-## Install
+- loading spatial transcript counts, coordinates, metadata, and the single-cell reference;
+- aggregating square-level transcript counts into configurable spatial bins;
+- estimating cell-type expression signatures from the single-cell reference;
+- estimating cell-type composition in each spatial bin using non-negative least squares (NNLS);
+- detecting spatial domains using smoothing and KMeans clustering;
+- providing scoring utilities for comparison with simulated ground truth;
+- recording provenance and checking raw-data integrity with manifests.
+
+The spatial bin size is configurable. The original square size is read from the dataset metadata rather than hard-coded in the analysis.
+
+The individual scientific components are implemented, but they are not yet connected through a single command-line entry point for the complete analysis workflow.
+
+Input and output formats are defined by the course Data Contract and are not duplicated here.
+
+## What do I need?
+
+Create the project environment from the repository root:
 
 ```bash
 conda env create -f environment.yml
@@ -24,39 +33,81 @@ conda activate pls2026
 pip install -e .
 ```
 
-The `-e` points the install at the source files, so an edit takes effect without reinstalling.
-Someone who only wants to *run* this project rather than work on it can leave it out; see the
-course document *Running a project from GitHub*.
+The project requires a dataset that follows the course Data Contract.
 
-## Run
+The course reference dataset is not committed to this repository and should be supplied to the analysis by path. Its source and retrieval instructions will be documented here once the course-provided location is confirmed.
+
+Analysis parameters are stored in:
+
+```text
+config/default.yaml
+```
+
+For example, the spatial bin size is read from this configuration file, while the original square size is read from the dataset `metadata.json`.
+
+## How do I run it?
+
+At the current stage of the project, the config-driven loading and spatial-binning stage can be run directly from Python.
+
+Replace `<dataset-path>` with the directory containing the course reference dataset:
 
 ```bash
-<the one command that produces a result>
+python -c "from spatial_decode.pipeline import prepare_binned_counts; b = prepare_binned_counts('<dataset-path>', 'config/default.yaml'); print(b.shape); print(b.head())"
 ```
+
+This calls:
+
+```python
+prepare_binned_counts(dataset_path, config_path)
+```
+
+which:
+
+1. loads the analysis configuration;
+2. loads the dataset;
+3. reads `bin_size_um` from `config/default.yaml`;
+4. reads `square_size_um` from the dataset metadata;
+5. aggregates square-level transcript counts into spatial bins.
+
+The remaining analysis components — signature estimation, NNLS deconvolution, spatial-domain detection, and scoring — are implemented as separate modules and are being connected into the complete pipeline in later project work.
+
+## What comes out?
+
+`prepare_binned_counts()` returns a pandas DataFrame with one row per spatial bin.
+
+It contains:
+
+- `bin_id` — the spatial-bin identifier;
+- `bin_row` and `bin_col` — the bin position on the spatial grid;
+- one column per gene containing the summed transcript counts in that bin.
+
+The raw input files are not modified.
+
+Downstream analysis modules use the binned transcript counts to estimate cell-type composition and identify spatial domains.
 
 ## Repository layout
 
+```text
+src/        importable analysis code
+tests/      automated tests and characterization checks
+config/     analysis parameters
+ai_log/     individual AI-use and verification logs
+SPEC.md     project requirements and acceptance criteria
 ```
-src/        the package you write
-tests/      the checks that prove it works
-config/     parameters — no magic numbers in the source
-SPEC.md     what this program must do, and how you will know it is correct
-ai_log/     your AI + verification log — one file per person, named for you
-```
 
-## Data
-
-The reference dataset is **not** in this repository. Refer to it by path; never commit data.
-
-<From Week 3: say where the data comes from and where the program expects it — a URL, a DOI, or
-"produced by group X's simulator". Someone who has only this repository has to be able to get it.>
+Raw datasets are not committed to the repository.
 
 ## Checks
 
+Run the project checks from the repository root:
+
 ```bash
-pytest        # the tests must pass
-ruff check .  # the style checks must pass
+python -m pytest -q
+python -m pytest --doctest-modules -q
+ruff check .
 ```
+
+`pytest --doctest-modules` runs the ordinary test suite together with executable examples contained in docstrings.
 
 ---
 
