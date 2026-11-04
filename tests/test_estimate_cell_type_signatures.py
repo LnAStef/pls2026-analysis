@@ -12,29 +12,33 @@ from spatial_decode.estimate_cell_type_signatures import (
 
 
 def test_mean_expression_matrix():
-        """Test mean gene expression by cell type on a small reference dataset.
+    """Test mean gene expression by cell type on a small reference dataset.
 
     Creates matching count and label tables for four reference cells, checks
     that their cell IDs match, merges the tables, and verifies that
     ``mean_expression_matrix`` returns the expected mean expression values.
     The expected matrix has genes as rows and cell types as columns.
     """
-    transcripts = pd.DataFrame({
-        "cell_id": ["Cell1", "Cell2", "Cell3", "Cell4"],
-        "Gene1": [12, 4, 0, 6],
-        "Gene2": [0, 8, 2, 4],
-    })
+    transcripts = pd.DataFrame(
+        {
+            "cell_id": ["Cell1", "Cell2", "Cell3", "Cell4"],
+            "Gene1": [12, 4, 0, 6],
+            "Gene2": [0, 8, 2, 4],
+        }
+    )
 
-    labels = pd.DataFrame({
-        "cell_id": ["Cell1", "Cell2", "Cell3", "Cell4"],
-        "cell_type": ["TypeA", "TypeB", "TypeB", "TypeA"],
-    })
+    labels = pd.DataFrame(
+        {
+            "cell_id": ["Cell1", "Cell2", "Cell3", "Cell4"],
+            "cell_type": ["TypeA", "TypeB", "TypeB", "TypeA"],
+        }
+    )
 
-
-    assert cell_id_match(transcripts, labels)  # Requires cell_id_match to return a bool.
+    assert cell_id_match(transcripts, labels)
 
     merged = merge_counts_types(transcripts, labels)
     actual = mean_expression_matrix(merged)
+
     expected = pd.DataFrame(
         {
             "TypeA": [9.0, 2.0],
