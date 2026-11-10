@@ -4,12 +4,12 @@ import json
 from pathlib import Path
 
 import pandas as pd
-
+from spatial_decode.validate import validate_dataset
 
 def load_dataset(dataset_path):
     """Load the analysis inputs from a dataset directory."""
     dataset_path = Path(dataset_path).expanduser()
-
+    validate_dataset(dataset_path)
     metadata_path = dataset_path / "metadata.json"
     coordinates_path = dataset_path / "coordinates.csv"
     counts_path = dataset_path / "counts.csv"

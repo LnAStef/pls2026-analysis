@@ -89,13 +89,15 @@ def validate_dataset(path):
             "pass the folder that contains metadata.json (Data Contract §2)."
         )
     required = [
-        "metadata.json",
-        "coordinates.csv",
-        "counts.csv",
-        "reference/reference_counts.csv",
-        "reference/reference_labels.csv",
-        "ground_truth/composition.csv",
-    ]
+    "metadata.json",
+    "coordinates.csv",
+    "counts.csv",
+    "reference/reference_counts.csv",
+    "reference/reference_labels.csv",
+    "ground_truth/params.json",
+    "ground_truth/composition.csv",
+    "ground_truth/domains.csv",
+]
     missing = [relative for relative in required if not (root / relative).is_file()]
     if missing:
         raise FileNotFoundError(

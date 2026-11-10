@@ -10,11 +10,20 @@ def test_run_analysis_connects_all_analysis_steps(tmp_path):
     """Run the analysis pipeline on a small synthetic dataset."""
     dataset_path = tmp_path / "dataset"
     reference_path = dataset_path / "reference"
+    ground_truth_path = dataset_path / "ground_truth"
+
     reference_path.mkdir(parents=True)
+    ground_truth_path.mkdir()
 
     # Dataset metadata: each input square is 2 um.
     metadata = {
+        "contract_version": "1.0",
         "square_size_um": 2,
+        "grid": {
+            "n_rows": 2,
+            "n_cols": 2,
+        },
+        "cell_types": ["A", "B"],
     }
     (dataset_path / "metadata.json").write_text(json.dumps(metadata))
 
@@ -29,8 +38,8 @@ def test_run_analysis_connects_all_analysis_steps(tmp_path):
             ],
             "array_row": [0, 0, 1, 1],
             "array_col": [0, 1, 0, 1],
-            "x_um": [0.0, 2.0, 0.0, 2.0],
-            "y_um": [0.0, 0.0, 2.0, 2.0],
+            "x_um": [1.0, 3.0, 1.0, 3.0],
+            "y_um": [1.0, 1.0, 3.0, 3.0],
         }
     )
     coordinates.to_csv(dataset_path / "coordinates.csv", index=False)
@@ -71,6 +80,58 @@ def test_run_analysis_connects_all_analysis_steps(tmp_path):
     )
     reference_labels.to_csv(
         reference_path / "reference_labels.csv",
+        index=False,
+    )
+
+    # Ground truth required by the Data Contract.
+    (ground_truth_path / "params.json").write_text("{}")
+
+    truth_composition = pd.DataFrame(
+        {
+            "square_id": [
+                "sq_r0_c0",
+                "sq_r0_c1",
+                "sq_r1_c0",
+                "sq_r1_c0",
+                "sq_r1_c1",
+                "sq_r1_c1",
+            ],
+            "cell_type": [
+                "A",
+                "B",
+                "A",
+                "B",
+                "A",
+                "B",
+            ],
+            "n_transcripts": [
+                10,
+                10,
+                8,
+                2,
+                2,
+                8,
+            ],
+        }
+    )
+    truth_composition.to_csv(
+        ground_truth_path / "composition.csv",
+        index=False,
+    )
+
+    truth_domains = pd.DataFrame(
+        {
+            "square_id": [
+                "sq_r0_c0",
+                "sq_r0_c1",
+                "sq_r1_c0",
+                "sq_r1_c1",
+            ],
+            "domain": ["D1", "D1", "D2", "D2"],
+        }
+    )
+    truth_domains.to_csv(
+        ground_truth_path / "domains.csv",
         index=False,
     )
 
