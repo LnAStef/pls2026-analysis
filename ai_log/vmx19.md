@@ -151,5 +151,45 @@ in the other df? Something like .isinstance but not for a class but an element. 
 - **Decision:** < accepted, I use the line of code moving forward. >
 
 
+## 10/11/2026
+
+- **Prompt / ask:** < How can I make this code run faster for large data frames while still keeping the basic structure I came up with more or less?
+    def scoring_RMSE(df_an, df_gt):
+        sum_diff = 0
+        for _index, row_an in df_an.iterrows():
+            for _ind, row_gt in df_gt.iterrows():
+                if (row_an["square_id"] == row_gt["square_id"] and row_an["cell_type"] == row_gt["cell_type"]):
+                    diff = abs(row_an["n_transcripts"]-row_gt["n_transcripts"])
+                    sum_diff += diff
+                    print(_index, _ind) >
+        
+
+- **What it produced:** < 2 ways: use .intertuple() instead and create a dictioary first instead of looping through the data frames every time. >
 
 
+- **How you checked it:** < Known - answer test with a mock data frame. >
+
+
+- **What was wrong:** < nothing wrong per se but continued editing it until it fit my needs exactly. >
+
+
+- **Decision:** < accepted, I use the piece of code to move forward. >
+
+
+## 10/11/2026
+
+- **Prompt / ask:** < What is code I can use to calculate the ARI between two data frames? I also gave it the domains.csv file as an example of 
+what I want to compare. I asked to explain what it codes exactly. >
+        
+
+- **What it produced:** < A code to calculate the ARI. >
+
+
+- **How you checked it:** < Known - answer test with a mock data frame. >
+
+
+- **What was wrong:** < nothing wrong per se but continued editing it until it fit my needs exactly. It produced a very specific code only useable for this one type of .csv file.  
+I continued working on it until it was useable for more general data frames with the same structure. >
+
+
+- **Decision:** < accepted, I use the piece of code to move forward. >
