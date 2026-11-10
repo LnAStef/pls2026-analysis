@@ -49,7 +49,7 @@ def test_deconvolve_empty_bin_is_nan():
 
 def test_deconvolve_rejects_mismatched_genes():
     wrong = binned_tiny.rename(columns={"GENE_1": "OTHER"})
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="gene names"):
         deconvolve(S_tiny, wrong)
 
 def test_deconvolve_units_are_transcripts_not_cells():
