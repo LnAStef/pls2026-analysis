@@ -10,7 +10,8 @@ def test_load_dataset_reads_expected_files(tmp_path):
     dataset_dir = tmp_path / "dataset"
     reference_dir = dataset_dir / "reference"
     reference_dir.mkdir(parents=True)
-
+    ground_truth_dir = dataset_dir / "ground_truth"
+    ground_truth_dir.mkdir()
     metadata = {
         "contract_version": "1.0",
         "square_size_um": 2,
@@ -31,7 +32,17 @@ def test_load_dataset_reads_expected_files(tmp_path):
     (reference_dir / "reference_labels.csv").write_text(
         "cell_id,cell_type\nref_0001,A\n"
     )
+    (ground_truth_dir / "params.json").write_text("{}")
 
+    (ground_truth_dir / "composition.csv").write_text(
+        "square_id,cell_type,n_transcripts\n"
+        "sq_r000_c000,A,3\n"
+    )
+
+    (ground_truth_dir / "domains.csv").write_text(
+        "square_id,domain\n"
+        "sq_r000_c000,D1\n"
+    )
     dataset = load_dataset(dataset_dir)
 
     assert set(dataset) == {

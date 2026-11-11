@@ -27,8 +27,12 @@ Input and output formats are defined by the course Data Contract and are not dup
 
 Create the project environment from the repository root:
 
+<<<<<<< HEAD
+```bash
+=======
 ```
 bash
+>>>>>>> origin/cc-updates
 conda env create -f environment.yml
 conda activate pls2026
 pip install -e .
@@ -112,6 +116,10 @@ ruff check .
 
 ---
 
+The sections below are stubs. Each is filled in during the week named, and together they are what
+makes this repository runnable by someone who has never met you. The long-form explanation of what a
+runner does with them is the course document *Running a project from GitHub* — do not copy it in
+here; a README is answers, not a manual.
 
 ## Run in a container *(Week 11)*
 
