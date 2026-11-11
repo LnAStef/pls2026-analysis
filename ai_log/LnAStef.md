@@ -63,3 +63,25 @@
   undefined, and Data Contract §5 excludes them from scoring
 
 ---
+## 2026-11-10 — deconvolve: mutation experiment and tests for surviving mutants
+
+- **Prompt / question:** "Which mutations of deconvolve() does my test suite
+  catch? Write the tests for the ones that survive, plus a metamorphic test."
+- **What it produced:** a script that applies six mutations to a temporary copy
+  of the package and runs my tests on each; four new tests (asymmetric-S test,
+  empty-bin-without-warning test, depth-scaling metamorphic test, parametrized
+  fractions-are-valid property test)
+- **How I checked it:** ran the script before and after adding the tests;
+  baseline green both times (7 tests, then 12). Run 1: mutations 1-4 caught,
+  5 and 6 survived. Run 2: all six caught. The script left my files unchanged.
+- **What was wrong:**
+  1. dropping the zero-total guard survived: 0/0 still gives NaN, with only a
+     RuntimeWarning, so the output looked identical
+  2. normalising rows instead of columns survived: my test S matrices were
+     symmetric or diagonal, so rows and columns normalise the same way
+  3. there was no property test for "fractions sum to 1" although the spec
+     claimed it
+- **Decision:** accepted; deconvolve() is tested in isolation, because
+  pipeline.py does not call it yet
+
+---
