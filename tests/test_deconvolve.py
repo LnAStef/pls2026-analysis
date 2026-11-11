@@ -1,3 +1,4 @@
+import warnings
 import hashlib
 import json
 
@@ -41,15 +42,42 @@ def test_deconvolve_ignores_gene_order():
         deconvolve(S_tiny, binned_tiny), deconvolve(S_tiny, shuffled)
     )
 
+def test_deconvolve_normalises_columns_not_rows():
+    """S is deliberately asymmetric: row sums differ from column sums."""
+    S = pd.DataFrame({"A": [3.0, 1.0], "B": [1.0, 1.0]}, index=["g1", "g2"])
+    # y = 4 * (A's profile [0.75, 0.25]) + 2 * (B's profile [0.5, 0.5]) = [4, 2]
+    y = pd.DataFrame({"g1": [4], "g2": [2]}, index=["bin"])
+    result = deconvolve(S, y)
+    assert np.allclose(result.loc["bin"], [2 / 3, 1 / 3])
 
-def test_deconvolve_empty_bin_is_nan():
+
+def test_deconvolve_empty_bin_is_nan_without_warning():
     empty = pd.DataFrame({"GENE_1": [0], "GENE_2": [0]}, index=["bin_empty"])
-    assert deconvolve(S_tiny, empty).isna().all(axis=None)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")  # a silent 0/0 would raise RuntimeWarning
+        result = deconvolve(S_tiny, empty)
+    assert result.isna().all(axis=None)
+
+
+def test_deconvolve_fractions_ignore_total_depth():
+    """Metamorphic: doubling every count must not change the fractions."""
+    doubled = binned_tiny * 2
+    pd.testing.assert_frame_equal(
+        deconvolve(S_tiny, binned_tiny), deconvolve(S_tiny, doubled), atol=1e-9
+    )
+
+
+@pytest.mark.parametrize("scale", [1, 3, 50])
+def test_deconvolve_fractions_are_valid(scale):
+    """Property: every non-empty bin has fractions >= 0 that sum to 1."""
+    result = deconvolve(S_tiny, binned_tiny * scale)
+    assert (result.to_numpy() >= 0).all()
+    assert np.allclose(result.sum(axis=1), 1.0)
 
 
 def test_deconvolve_rejects_mismatched_genes():
     wrong = binned_tiny.rename(columns={"GENE_1": "OTHER"})
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="gene names"):
         deconvolve(S_tiny, wrong)
 
 def test_deconvolve_units_are_transcripts_not_cells():
