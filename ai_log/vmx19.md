@@ -151,5 +151,18 @@ in the other df? Something like .isinstance but not for a class but an element. 
 - **Decision:** < accepted, I use the line of code moving forward. >
 
 
+## 23/11/2026
+
+- **Prompt / ask:** < Add to the existing code so that it also returns a composition matrix and then please explain the whole code again. >
+        
+
+- **What it produced:** < a way to return a composition matrix and detailed explanation of the code to help me understand. >
 
 
+- **How you checked it:** < I implemeted into my code. >
+
+
+- **What was wrong:** < nothing found. >
+
+
+- **Decision:** < accepted, I use the code moving forward. >
