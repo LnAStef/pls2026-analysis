@@ -21,6 +21,10 @@ name = "spatial-decode"          # your package: tissue-sim or spatial-decode
 version = "0.1.0"
 requires-python = ">=3.11"
 
+# `pip install -e .` also puts this command on your PATH; same as scripts/run_analysis.py.
+[project.scripts]
+spatial-decode = "spatial_decode.cli:main"
+
 # Your code lives in src/<package>/, so that is where setuptools is told to look.
 [tool.setuptools.packages.find]
 where = ["src"]

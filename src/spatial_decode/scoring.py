@@ -24,8 +24,6 @@ def _square_to_bin_mapping(coordinates, bin_size_um, square_size_um):
     mapping["bin_id"] = [
         f"bin_r{row}_c{col}"
         for row, col in zip(mapping["bin_row"], mapping["bin_col"], strict=True,)]
-    
-    print("mapping done:", mapping)
 
     return mapping
 
@@ -56,8 +54,6 @@ def aggregate_truth_composition(truth_composition, coordinates, bin_size_um, squ
     non_empty = totals > 0
 
     composition.loc[non_empty] = counts.loc[non_empty].div(totals.loc[non_empty], axis=0)
-    
-    print("truth composition aggregated:", composition)
 
     return composition
 
@@ -68,6 +64,8 @@ def score_composition(predicted_composition, truth_composition, coordinates, bin
     Also returns the ground-truth composition matrix.
     """
     truth = aggregate_truth_composition(truth_composition, coordinates, bin_size_um, square_size_um)
+    # Keep the full matrix (all bins, NaN for empty ones) to return; `truth` is narrowed below.
+    composition_matrix = truth.copy()
 
     predicted = predicted_composition.pivot(index="bin_id", columns="cell_type", values="fraction")
 
@@ -104,7 +102,7 @@ def score_composition(predicted_composition, truth_composition, coordinates, bin
 
     return {"rmse": float(rmse_per_bin.mean()),
             "jensen_shannon_divergence": float(js_per_bin.mean()),
-           "composition_matrix": aggregate_truth_composition(truth_composition, coordinates, bin_size_um, square_size_um)}
+           "composition_matrix": composition_matrix}
 
 
 def score_domains(predicted_domains, truth_domains,coordinates, bin_size_um, square_size_um):
@@ -118,8 +116,6 @@ def score_domains(predicted_domains, truth_domains,coordinates, bin_size_um, squ
     if comparison["domain_predicted"].isna().any():
         raise ValueError("one or more squares have no predicted domain")
 
-    print("domains were scored")
-    
     return float(adjusted_rand_score(comparison["domain_truth"], comparison["domain_predicted"]))
 
 
