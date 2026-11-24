@@ -147,9 +147,10 @@ def stamp(config_path, seed, manifest_path):
         git_commit = ""
         git_clean = False
 
-    manifest_path = Path(manifest_path)
-
-    manifest_digest = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+    if manifest_path is None:
+        manifest_digest = None  # run without a checksum manifest
+    else:
+        manifest_digest = hashlib.sha256(Path(manifest_path).read_bytes()).hexdigest()
 
     return {
         "git_commit": git_commit,

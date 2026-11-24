@@ -121,7 +121,7 @@ TBD means no test exists yet; the owner fills it in.
 | 8 um bins sum to the 16 um bin, gene by gene | property | `test_binning.py::test_four_8um_bins_sum_to_one_16um_bin` |
 | teammate can rebuild the environment, clean pytest | reproducibility | TBD |
 | program refuses to run on checksum mismatch | schema / validation | `test_provenance.py::test_modified_raw_file_stops_the_program` |
-| delete results/, rerun, same outputs | reproducibility | TBD |
+| delete results/, rerun, same outputs | reproducibility | `test_cli.py::test_deleting_results_and_rerunning_reproduces_outputs` |
 | deconvolve() output matches the golden hash | characterization | `test_deconvolve.py::test_deconvolve_characterization` |
 | ruff check exits cleanly | schema / validation | TBD (by hand, no CI) |
 | ruff format does not change the output | characterization | `test_characterization.py::test_reference_report_matches_golden_output` |

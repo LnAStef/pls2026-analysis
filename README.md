@@ -5,106 +5,110 @@
 
 ## What is this?
 
-`spatial-decode` is an analysis pipeline for synthetic spatial-transcriptomics data.
+`spatial-decode` estimates, from synthetic spatial-transcriptomics data, which cell types each
+spatial bin contains and which tissue domain each bin belongs to, then scores both against the
+simulator's ground truth.
 
-The project currently implements the main scientific components required by the analysis track:
+One command runs the whole pipeline:
 
-- loading spatial transcript counts, coordinates, metadata, and the single-cell reference;
-- aggregating square-level transcript counts into configurable spatial bins;
-- estimating cell-type expression signatures from the single-cell reference;
-- estimating cell-type composition in each spatial bin using non-negative least squares (NNLS);
-- detecting spatial domains using smoothing and KMeans clustering;
-- providing scoring utilities for comparison with simulated ground truth;
-- recording provenance and checking raw-data integrity with manifests.
+1. checks the input files against the committed checksum manifest;
+2. bins the 2 µm squares into larger bins (`bin_size_um` in the config);
+3. estimates cell-type signatures from the single-cell reference;
+4. estimates each bin's cell-type composition with non-negative least squares (NNLS);
+5. detects spatial domains with KMeans, with and without spatial smoothing;
+6. scores the predictions (RMSE, Jensen–Shannon divergence, ARI) and writes everything to `results/`.
 
-The spatial bin size is configurable. The original square size is read from the dataset metadata rather than hard-coded in the analysis.
+Input and output formats follow the course Data Contract.
 
-The individual scientific components are implemented, but they are not yet connected through a single command-line entry point for the complete analysis workflow.
+## Installation
 
-Input and output formats are defined by the course Data Contract and are not duplicated here.
+From the repository root:
 
-## What do I need?
-
-Create the project environment from the repository root:
-
-<<<<<<< HEAD
 ```bash
-=======
-```
-bash
->>>>>>> origin/cc-updates
 conda env create -f environment.yml
 conda activate pls2026
 pip install -e .
 ```
 
-The project requires a dataset that follows the course Data Contract.
+Nothing else needs installing by hand.
 
-The course reference dataset is not committed to this repository and should be supplied to the analysis by path. Its source and retrieval instructions will be documented here once the course-provided location is confirmed.
+## Getting the data
 
-Analysis parameters are stored in:
+The dataset is **not** in this repository. Use the course reference dataset (the
+`reference_dataset/` folder shipped with the pre-course material) and copy it to:
 
 ```text
-config/default.yaml
+data/
+├── raw_manifest.sha256          # committed: checksums of the files below
+└── raw/
+    └── reference_dataset/
+        ├── metadata.json
+        ├── coordinates.csv
+        ├── counts.csv
+        ├── reference/
+        │   ├── reference_counts.csv
+        │   └── reference_labels.csv
+        └── ground_truth/        # read only by scoring and tests, never by inference
+            ├── params.json
+            ├── composition.csv
+            └── domains.csv
 ```
-
-For example, the spatial bin size is read from this configuration file, while the original square size is read from the dataset `metadata.json`.
-
-## How do I run it?
-
-At the current stage of the project, the config-driven loading and spatial-binning stage can be run directly from Python.
-
-Replace `<dataset-path>` with the directory containing the course reference dataset:
 
 ```bash
-python -c "from spatial_decode.pipeline import prepare_binned_counts; b = prepare_binned_counts('<dataset-path>', 'config/default.yaml'); print(b.shape); print(b.head())"
+mkdir -p data/raw
+cp -r /path/to/reference_dataset data/raw/
+chmod -R a-w data/raw          # optional: protect the inputs from accidental edits
 ```
 
-This calls:
+`data/raw/` is ignored by git. The run refuses to start if any file there differs from
+`data/raw_manifest.sha256`.
 
-```python
-prepare_binned_counts(dataset_path, config_path)
+## Running the analysis
+
+```bash
+python scripts/run_analysis.py --config config/default.yaml --data-dir data/raw/reference_dataset --out-dir results
 ```
 
-which:
+These are also the defaults, so `python scripts/run_analysis.py` does the same. After
+`pip install -e .`, the same command is available as `spatial-decode`. `--help` lists every option.
 
-1. loads the analysis configuration;
-2. loads the dataset;
-3. reads `bin_size_um` from `config/default.yaml`;
-4. reads `square_size_um` from the dataset metadata;
-5. aggregates square-level transcript counts into spatial bins.
+Scientific parameters (bin size, number of domains, smoothing radius, seed) are in
+`config/default.yaml`. The square size comes from the dataset's `metadata.json`.
 
-The remaining analysis components — signature estimation, NNLS deconvolution, spatial-domain detection, and scoring — are implemented as separate modules and are being connected into the complete pipeline in later project work.
+**Datasets from a simulation-track group** are not covered by our manifest. Run them with
+`--skip-manifest-check`; `run_metadata.json` then records `"manifest_checked": false`.
 
-## What comes out?
+## Output files
 
-`prepare_binned_counts()` returns a pandas DataFrame with one row per spatial bin.
+Every run writes these files to `--out-dir` (default `results/`, ignored by git, safe to
+delete):
 
-It contains:
+| File | Contents |
+|---|---|
+| `predicted_composition.csv` | `bin_id, cell_type, fraction`: one row per bin and cell type. Fractions sum to 1 per bin; zero-transcript bins are NaN. |
+| `predicted_domains.csv` | `bin_id, domain`: domain label per bin, after spatial smoothing. Bins with no transcripts get `-1`. |
+| `predicted_domains_unsmoothed.csv` | Same format, without smoothing (for comparison). |
+| `scores.json` | `rmse`, `jensen_shannon_divergence`, `ari` (smoothed), `ari_unsmoothed`. |
+| `run_metadata.json` | Git commit, whether the tree was clean, config path and full parameters, seed, `bin_size_um`, contract and tool version, input-manifest checksum, command line and timestamp. |
 
-- `bin_id` — the spatial-bin identifier;
-- `bin_row` and `bin_col` — the bin position on the spatial grid;
-- one column per gene containing the summed transcript counts in that bin.
-
-The raw input files are not modified.
-
-Downstream analysis modules use the binned transcript counts to estimate cell-type composition and identify spatial domains.
+Rerunning with the same config, seed and data reproduces every file byte for byte, except the
+`created` timestamp in `run_metadata.json` (tested in `tests/test_cli.py`).
 
 ## Repository layout
 
 ```text
-src/        importable analysis code
-tests/      automated tests and characterization checks
-config/     analysis parameters
-ai_log/     individual AI-use and verification logs
-SPEC.md     project requirements and acceptance criteria
+src/spatial_decode/   importable analysis code (cli.py is the entry point)
+scripts/              run_analysis.py: the one-command run
+tests/                automated tests; tests/golden/ holds characterization outputs
+config/               analysis parameters (default.yaml)
+data/                 raw_manifest.sha256 (committed); raw/ is where you put the dataset
+ai_log/               individual AI-use and verification logs
+SPEC.md               requirements and acceptance criteria
 ```
-
-Raw datasets are not committed to the repository.
 
 ## Checks
 
-Run the project checks from the repository root:
+From the repository root:
 
 ```bash
 python -m pytest -q
@@ -112,7 +116,9 @@ python -m pytest --doctest-modules -q
 ruff check .
 ```
 
-`pytest --doctest-modules` runs the ordinary test suite together with executable examples contained in docstrings.
+Without the dataset in `data/raw/reference_dataset/`, the two reference-dataset tests
+(`test_smoke.py`, `test_characterization.py`) are **skipped** and tell you where the data should
+go. Everything else runs on small synthetic inputs built inside the tests.
 
 ---
 
