@@ -20,7 +20,7 @@ def bin_counts(counts, coordinates, bin_size_um, square_size_um):
         on="square_id",
         how="inner",
         validate="one_to_one",
-    )
+    ).copy()  # consolidate memory blocks; avoids pandas PerformanceWarning on 100+ genes
 
     combined["bin_row"] = combined["array_row"] // k
     combined["bin_col"] = combined["array_col"] // k

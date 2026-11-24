@@ -1,18 +1,19 @@
 """Smoke test for week3."""
 
 import json
-from pathlib import Path
+
+from conftest import DEFAULT_CONFIG, MANIFEST
 
 from spatial_decode.report import report_shape
 
 
-def test_program_runs_end_to_end(tmp_path, capsys):
+def test_program_runs_end_to_end(reference_dataset, tmp_path, capsys):
     """Load the reference dataset and produce Week 3 outputs."""
     report_shape(
-        dataset_dir=Path("data/raw/reference_dataset"),
+        dataset_dir=reference_dataset,
         results_dir=tmp_path,
-        manifest_path=Path("data/raw_manifest.sha256"),
-        config_path=Path("config/default.yaml"),
+        manifest_path=MANIFEST,
+        config_path=DEFAULT_CONFIG,
         seed=20260101,
     )
 
