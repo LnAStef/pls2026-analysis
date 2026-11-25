@@ -64,3 +64,13 @@ def test_modified_raw_file_stops_the_program(tmp_path):
             root,
             manifest_path,
         )
+
+
+def test_macos_metadata_files_are_ignored(tmp_path):
+    """`._*` and `.DS_Store` files from unpacking on a Mac must not count as added data."""
+    root, manifest_path = a_small_raw_directory(tmp_path)
+
+    (root / "._counts.csv").write_bytes(b"\x00\x05\x16\x07")
+    (root / ".DS_Store").write_bytes(b"\x00\x00\x00\x01")
+
+    assert verify(root, manifest_path) == {"changed": set(), "missing": set(), "added": set()}
