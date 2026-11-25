@@ -11,7 +11,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 RAW_DIR = REPO_ROOT / "data" / "raw"
-REFERENCE_DATASET = RAW_DIR / "reference_dataset"
+REFERENCE_DATASET = RAW_DIR / "reference_dataset" / "dataset"
 MANIFEST = REPO_ROOT / "data" / "raw_manifest.sha256"
 DEFAULT_CONFIG = REPO_ROOT / "config" / "default.yaml"
 GOLDEN_DIR = REPO_ROOT / "tests" / "golden"
@@ -28,6 +28,6 @@ def reference_dataset():
     if not (REFERENCE_DATASET / "metadata.json").is_file():
         pytest.skip(
             f"reference dataset not found at {REFERENCE_DATASET.relative_to(REPO_ROOT)}/ "
-            "- copy the course reference_dataset/ folder there (see README)"
+            "- copy the course reference_dataset/ folder into data/raw/ (see README)"
         )
     return REFERENCE_DATASET

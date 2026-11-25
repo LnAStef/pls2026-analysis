@@ -4,7 +4,7 @@ Usage (from the repository root):
 
     python scripts/run_analysis.py \\
         --config config/default.yaml \\
-        --data-dir data/raw/reference_dataset \\
+        --data-dir data/raw/reference_dataset/dataset \\
         --out-dir results
 
 Files written to --out-dir:
@@ -52,8 +52,9 @@ def parse_args(argv=None):
         help="analysis parameters (default: config/default.yaml)",
     )
     parser.add_argument(
-        "--data-dir", type=Path, default=Path("data/raw/reference_dataset"),
-        help="dataset folder holding metadata.json (default: data/raw/reference_dataset)",
+        "--data-dir", type=Path, default=Path("data/raw/reference_dataset/dataset"),
+        help="dataset folder holding metadata.json "
+        "(default: data/raw/reference_dataset/dataset)",
     )
     parser.add_argument(
         "--out-dir", type=Path, default=Path("results"),

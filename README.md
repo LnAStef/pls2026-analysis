@@ -34,39 +34,49 @@ Nothing else needs installing by hand.
 
 ## Getting the data
 
-The dataset is **not** in this repository. Use the course reference dataset (the
-`reference_dataset/` folder shipped with the pre-course material) and copy it to:
+The dataset is **not** in this repository. Use the course reference dataset: the
+`reference_dataset/` folder from the pre-course material (`Pre-course.gz`). Copy that folder
+**as it is**, without renaming or flattening anything, into `data/raw/`:
 
 ```text
 data/
-├── raw_manifest.sha256          # committed: checksums of the files below
+├── raw_manifest.sha256              # committed: checksums of the files below
 └── raw/
-    └── reference_dataset/
-        ├── metadata.json
-        ├── coordinates.csv
-        ├── counts.csv
-        ├── reference/
-        │   ├── reference_counts.csv
-        │   └── reference_labels.csv
-        └── ground_truth/        # read only by scoring and tests, never by inference
-            ├── params.json
-            ├── composition.csv
-            └── domains.csv
+    └── reference_dataset/           # the pre-course folder, unchanged
+        ├── README.md                # course notes on the dataset
+        ├── expected_scores.json     # scores a reference implementation reaches
+        └── dataset/                 # this is what --data-dir points at
+            ├── metadata.json
+            ├── coordinates.csv
+            ├── counts.csv
+            ├── reference/
+            │   ├── reference_counts.csv
+            │   └── reference_labels.csv
+            └── ground_truth/        # read only by scoring and tests, never by inference
+                ├── params.json
+                ├── composition.csv
+                └── domains.csv
 ```
 
 ```bash
 mkdir -p data/raw
-cp -r /path/to/reference_dataset data/raw/
+cp -r /path/to/Pre-course/reference_dataset data/raw/
 chmod -R a-w data/raw          # optional: protect the inputs from accidental edits
 ```
 
-`data/raw/` is ignored by git. The run refuses to start if any file there differs from
-`data/raw_manifest.sha256`.
+On Windows, copy the `reference_dataset` folder into `data\raw\` in Explorer.
+
+If the archive was unpacked on a Mac, you will also see files starting with `._` (and maybe
+`.DS_Store`). These are macOS metadata, not data: you can leave them or delete them, the
+checksum check ignores them.
+
+`data/raw/` is ignored by git. The run refuses to start if any file in
+`data/raw/reference_dataset/` differs from `data/raw_manifest.sha256`.
 
 ## Running the analysis
 
 ```bash
-python scripts/run_analysis.py --config config/default.yaml --data-dir data/raw/reference_dataset --out-dir results
+python scripts/run_analysis.py --config config/default.yaml --data-dir data/raw/reference_dataset/dataset --out-dir results
 ```
 
 These are also the defaults, so `python scripts/run_analysis.py` does the same. After
@@ -116,7 +126,7 @@ python -m pytest --doctest-modules -q
 ruff check .
 ```
 
-Without the dataset in `data/raw/reference_dataset/`, the two reference-dataset tests
+Without the dataset in `data/raw/reference_dataset/dataset/`, the two reference-dataset tests
 (`test_smoke.py`, `test_characterization.py`) are **skipped** and tell you where the data should
 go. Everything else runs on small synthetic inputs built inside the tests.
 
@@ -166,7 +176,7 @@ rights, and on macOS or Windows it runs a Linux virtual machine.
 <docker run --rm \
     -v "$PWD/data:/data:ro" \
     -v "$PWD/results:/results" \
-    ghcr.io/your-group/your-project:tag --data-dir /data/raw --out-dir /results>
+    ghcr.io/your-group/your-project:tag --data-dir /data/raw/reference_dataset/dataset --out-dir /results>
 ```
 
 <`podman` takes the same arguments. The two `-v` options are what give the container your data and

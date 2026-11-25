@@ -1,6 +1,16 @@
 import hashlib
 from pathlib import Path
 
+# macOS writes these when a folder is copied or unpacked (AppleDouble "._*" files,
+# Finder's ".DS_Store"). They hold file-system metadata, not data, and appear or vanish
+# depending on how the archive was extracted, so they are left out of the manifest.
+_IGNORED_NAMES = {".DS_Store"}
+_IGNORED_PREFIX = "._"
+
+
+def _is_ignored(path):
+    return path.name in _IGNORED_NAMES or path.name.startswith(_IGNORED_PREFIX)
+
 
 def manifest(root):
     """Fingerprint every file under a directory.
@@ -11,12 +21,13 @@ def manifest(root):
         {relative_path: sha256 hex digest}, one entry per file, keyed by its path
         relative to `root`. Hashes are of the file's exact bytes (`read_bytes()`, not
         `read_text()`), since a text decode can silently change what gets hashed.
+        macOS metadata files (`._*`, `.DS_Store`) are skipped.
     """
     root = Path(root)
     return {
         str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in root.rglob("*")
-        if path.is_file()
+        if path.is_file() and not _is_ignored(path)
     }
 
 
