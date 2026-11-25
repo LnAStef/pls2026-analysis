@@ -14,23 +14,24 @@ def test_prepare_binned_counts_uses_config_and_metadata(tmp_path):
     reference_path.mkdir(parents=True)
     ground_truth_path.mkdir()
     metadata = {
-    "contract_version": "1.0",
-    "square_size_um": 2,
-    "grid": {
-        "n_rows": 2,
-        "n_cols": 2,
-    },
-    "cell_types": ["A"],
-}
+        "contract_version": "1.0",
+        "square_size_um": 2,
+        "grid": {
+            "n_rows": 2,
+            "n_cols": 2,
+        },
+        "cell_types": ["A"],
+    }
     (dataset_path / "metadata.json").write_text(json.dumps(metadata))
 
     coordinates = pd.DataFrame(
-        {"square_id": ["s0", "s1", "s2", "s3"],
-        "array_row": [0, 0, 1, 1],
-        "array_col": [0, 1, 0, 1],
-        "x_um": [1.0, 3.0, 1.0, 3.0],
-        "y_um": [1.0, 1.0, 3.0, 3.0],
-            }
+        {
+            "square_id": ["s0", "s1", "s2", "s3"],
+            "array_row": [0, 0, 1, 1],
+            "array_col": [0, 1, 0, 1],
+            "x_um": [1.0, 3.0, 1.0, 3.0],
+            "y_um": [1.0, 1.0, 3.0, 3.0],
+        }
     )
     coordinates.to_csv(dataset_path / "coordinates.csv", index=False)
 
@@ -58,28 +59,34 @@ def test_prepare_binned_counts_uses_config_and_metadata(tmp_path):
     (ground_truth_path / "params.json").write_text("{}")
 
     pd.DataFrame(
-    {
-        "square_id": ["s0", "s1", "s2", "s3"],
-        "cell_type": ["A", "A", "A", "A"],
-        "n_transcripts": [1, 2, 3, 4],
-    }
+        {
+            "square_id": ["s0", "s1", "s2", "s3"],
+            "cell_type": ["A", "A", "A", "A"],
+            "n_transcripts": [1, 2, 3, 4],
+        }
     ).to_csv(
-    ground_truth_path / "composition.csv",
-    index=False,
+        ground_truth_path / "composition.csv",
+        index=False,
     )
 
     pd.DataFrame(
-    {
-        "square_id": ["s0", "s1", "s2", "s3"],
-        "domain": ["D1", "D1", "D1", "D1"],
-    }
+        {
+            "square_id": ["s0", "s1", "s2", "s3"],
+            "domain": ["D1", "D1", "D1", "D1"],
+        }
     ).to_csv(
-    ground_truth_path / "domains.csv",
-    index=False,
+        ground_truth_path / "domains.csv",
+        index=False,
     )
     config_path = tmp_path / "config.yaml"
-    config_path.write_text("bin_size_um: 4\n")
 
+    config_path.write_text(
+        "seed: 20260101\n"
+        "bin_size_um: 4\n"
+        "n_domains: 1\n"
+        "smoothing_radius: 0\n"
+        "kmeans_n_init: 10\n"
+    )
     binned = prepare_binned_counts(dataset_path, config_path)
 
     assert len(binned) == 1
