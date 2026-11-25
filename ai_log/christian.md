@@ -1,5 +1,51 @@
 # AI + verification log — Christian
 
+## 2026-11-25 — make the repo accept the reference dataset as shipped
+
+- **Prompt / ask:** The Pre-course `reference_dataset/` has the data one level down in
+  `dataset/` (plus `README.md`, `expected_scores.json` and macOS `._*` files), but the repo
+  expected it flat in `data/raw/reference_dataset/`. Asked Claude to fix the mismatch, then
+  clarified: change the repo to match the dataset, not the other way round, and update the README.
+- **What it produced:**
+  - default `--data-dir` → `data/raw/reference_dataset/dataset` (`cli.py`,
+    `scripts/run_analysis.py`, `tests/conftest.py`)
+  - `provenance.manifest()` skips `._*` and `.DS_Store`, plus a new test
+    `test_macos_metadata_files_are_ignored`
+  - `data/raw_manifest.sha256` regenerated with our own `manifest()`/`write_manifest()` for the
+    shipped layout (now also covers the course `README.md` and `expected_scores.json`)
+  - README "Getting the data" rewritten to show the folder exactly as shipped
+- **How you checked it:**
+  - copied the unchanged Pre-course folder (`._` files included) into `data/raw/` →
+    `verify()` reports no changed/missing/added files
+  - compared the new manifest with the old one: the 8 data-file hashes are identical, only the
+    paths gained `dataset/`, so the data itself is the same as before
+  - rebased onto the updated `main` (after #68 global RMSE and #69 spec/tests) → applied cleanly
+  - `python -m pytest -q` → **74 passed, 0 skipped**. The two reference-dataset tests that were
+    skipped on 2026-11-24 now run on the real data and pass, including the characterization test.
+  - `ruff check .` → clean
+  - `python scripts/run_analysis.py` with all defaults on the real data (8 µm bins): RMSE 0.0220,
+    JSD 0.0061, ARI unsmoothed 0.482, ARI smoothed 0.909. Course `expected_scores.json` at 8 µm:
+    RMSE 0.0220, JSD 0.0061, ARI 0.482 / 0.806. RMSE, JSD and unsmoothed ARI match the reference
+    implementation; smoothed ARI is higher. (Before the global-RMSE change in #68 our RMSE was
+    0.0152, so the expected-score match also confirms that change.)
+    This closes the "still to do" from 2026-11-24 (ARI smoothed > 0.7 on the real dataset).
+- **What was wrong:**
+  1. Claude first misread the ask and did the opposite: it flattened the dataset into a zip to fit
+     the old repo layout. That zip is obsolete and should not be used.
+  2. Without the ignore rule, the `._*` files from unpacking on a Mac would count as "added"
+     files, and the run would refuse to start even on correct data.
+  3. Claude's first attempt to run the tests (`pip install -e .` + pytest) was blocked in its
+     session; the tests were then run with `PYTHONPATH=src` instead.
+  4. Pushing from the Claude session failed again (no write access). The change was exported as
+     a patch to apply with `git am`.
+  5. My first `git am` failed with "does not match index": I had uncommitted local edits in
+     `cli.py`, `provenance.py` and `test_provenance.py`. Git refuses to patch over them.
+     Fixed with `git am --abort`, then stashing/discarding the edits.
+- **Decision:** accepted after the checks above. To do: rerun the tests on my machine before
+  opening the PR.
+
+---
+
 ## 2026-11-24 — make the analysis runnable and reproducible from a fresh clone
 
 - **Prompt / ask:** Gave Claude the reviewer's feedback (priority list: fix repository-relative
