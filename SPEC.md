@@ -69,6 +69,10 @@ Optionally: composition RMSE and Jensen-Shannon divergence against ground truth.
 
 **[metamorphic test]** On the reference dataset at 8 µm, spatial smoothing improves domain recovery: ARI(smoothed) > ARI(unsmoothed), and ARI(smoothed) > 0.7.
 
+**[reproducibility test]** Two runs with the same configuration produce identical output. Running with --bin-size 16 produces different output, and run_metadata.json says so.
+
+**[schema / validation check]** A configuration file with an unknown key, a missing required key, or a method name you do not implement is rejected with a message naming the file and the key.
+
 
 ## First Known Answer - tiny input whose correct output we can state by hand
 
@@ -130,3 +134,5 @@ TBD means no test exists yet; the owner fills it in.
 | equal transcripts, 3-fold RNA content: 0.5 / 0.5 | known-answer | `test_deconvolve.py::test_deconvolve_units_are_transcripts_not_cells` |
 | non-empty fractions >= 0 and sum to 1 | property | `test_deconvolve.py::test_deconvolve_fractions_are_valid` |
 | smoothing improves ARI at 8 um | metamorphic | `test_spatialdomaindetection.py::test_smoothing_improves_ari_on_noisy_data` |
+| Different output with --bin-size 16, recorded run_metadata.json. | reproducibility | TBD |
+| config validator | schema / validation | TBD |
